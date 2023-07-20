@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>KENO Game</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/createjs/2.5.0/createjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/138/three.min.js"></script>
+    <script>
+      import createjs from "createjs";
+      import * as THREE from "three";
+
+      class KenoGame extends createjs.Sprite {
+        constructor() {
+          super();
+
+          this.loadImage("assets/keno-board.png");
+          this.x = 0;
+          this.y = 0;
+
+          this.scene = new THREE.Scene();
+          this.board = new THREE.Mesh(
+            new THREE.BoxGeometry(800, 600, 1),
+            new THREE.MeshBasicMaterial({ color: 0xffffff })
+          );
+          this.scene.add(this.board);
+
+          this.winningNumbers = [];
+        }
+
+        generateWinningNumbers() {
+          // Generate a list of 12 winning numbers from 1 to 80.
+          this.winningNumbers = [];
+          for (let i = 0; i < 12; i++) {
+            let winningNumber = Math.floor(Math.random() * 80) + 1;
+            while (winningNumber in this.winningNumbers) {
+              winningNumber = Math.floor(Math.random() * 80) + 1;
+            }
+            this.l.push(winningNumber);
+          }
+        }
+
+        render() {
+          super.render();
+
+          // Draw the winning numbers.
+          for (let i = 0; i < this.winningNumbers.length; i++) {
+            let winningNumber = this.winningNumbers[i];
+            let x = (winningNumber % 10) * 80;
+            let y = Math.floor(winningNumber / 10) * 80;
+            new THREE.MeshBasicMaterial({ color: 0x000000 }).draw(
+              this.board,
+              x,
+              y
+            );
+          }
+        }
+      }
+
+      let game = new KenoGame();
+      game.generateWinningNumbers();
+      game.render();
+
+      createjs.Ticker.addEventListener("tick", function () {
+        game.render();
+      });
+    </script>
+  </body>
+</html>
